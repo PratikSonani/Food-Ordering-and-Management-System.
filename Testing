@@ -1,0 +1,92 @@
+show tables;
+ 
+ select * from customer;
+
+ 
+-- Retrieve the names of all customers who have allergies.
+ select fname,lname from customer where allergy is not  null;
+ 
+SELECT fname, lname
+FROM customer
+WHERE allergy IS NOT NULL;
+
+ -- Find the cuisines offered by a specific chef.
+ SELECT c.cuisinename
+FROM cuisine c
+JOIN chef ch USING (cuisineid)
+WHERE ch.chefname = 'Chef Mario';
+
+SELECT c.cuisinename
+FROM cuisine c
+JOIN chef ch ON c.cuisineid = ch.cuisineid
+WHERE ch.chefname = 'Chef Mario';
+
+ -- List the total number of ingredients for each cuisine
+ 
+ SELECT c.cuisinename, COUNT(i.ingid) AS ingredient_count
+FROM cuisine c
+LEFT JOIN food f ON c.cuisineid = f.cuisineid
+LEFT JOIN ingredient i ON f.ingid = i.ingid
+GROUP BY c.cuisineid, c.cuisinename;
+
+-- Calculate the total cost of each order, including food and drinks.
+
+SELECT o.ordid, 
+    (SELECT SUM(price) FROM food WHERE foodid = o.foodid) +
+    (SELECT SUM(price) FROM drink WHERE drinkid = o.drinkid) AS total_cost
+FROM orders o;
+
+-- Retrieve the names of customers who have placed orders through the "Express Delivery" service.
+
+SELECT c.fname, c.lname
+FROM customer c
+INNER JOIN delivery d ON c.custid = d.custid AND d.delname = 'Express Delivery';
+
+SELECT c.fname, c.lname
+FROM customer c
+JOIN delivery d ON c.custid = d.custid
+WHERE d.delname = 'Express Delivery';
+
+
+ -- List the chefs who have not prepared any food.
+ 
+ SELECT ch.chefname
+FROM chef ch
+LEFT JOIN food f ON ch.chefid = f.chefid
+WHERE f.foodid IS NULL;
+
+SELECT ch.chefname
+FROM chef ch
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM food f
+    WHERE f.chefid = ch.chefid
+);
+
+-- Retrieve the names of all customers who are allergic to eggs
+SELECT fname, lname
+FROM customer
+WHERE custid IN (
+    SELECT custid
+    FROM allergy
+    WHERE allergy = 'Peanuts'
+);      -- X
+
+select fname,lname
+From customer
+Where allergy="eggs";
+
+
+-- Find the ingredients added in Margherita Pizza
+
+SELECT ingname
+FROM ingredient
+WHERE ingid IN (
+    SELECT ingid
+    FROM food
+    WHERE foodname = 'Margherita Pizza'
+);
+
+select ingname
+From ingredient
+Where ingid in (select ingid from food Where foodname="Margherita Pizza");
